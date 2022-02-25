@@ -1,0 +1,39 @@
+name: Complete Release to Production
+
+on:
+  pull_request_review:
+    types: [submitted]
+    branches:
+      - main
+      - staging
+
+jobs:
+  merge_release:
+    if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'staging' && github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Merge Release PR
+        run: gh pr merge '${{ github.event.pull_request.number }}' --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check out entire, updated repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Open Backmerge PR
+        run: gh pr create --base staging --head main --title "Backmerge ⏩" --body "Backmerge for #${{ github.event.pull_request.number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  merge_backmerge:
+    if: github.event.pull_request.base.ref == 'staging' && github.event.pull_request.head.ref == 'main' && github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Merge Release PR
+        run: gh pr merge '${{ github.event.pull_request.number }}' --merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
