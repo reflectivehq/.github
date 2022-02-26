@@ -1,0 +1,47 @@
+name: Prepare Release to Production
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Detect changes
+        run: |
+          numChanges="$(git rev-list --count staging ^origin/main)"
+          echo 'NUM_CHANGES='$numChanges >> $GITHUB_ENV
+      - name: Prepare changes
+        if: env.NUM_CHANGES != '0'
+        run: |
+          echo -e "## 🚨 Deploying to Production 🚨\n\n" > desc.txt
+          git shortlog origin/main...staging --no-merges -c >> desc.txt
+          echo 'CHANGES_DESC='$(cat desc.txt) >> $GITHUB_ENV
+          sed -i -e 's/      / - /g' desc.txt
+      - name: Find Release PR
+        if: env.CHANGES_DESC != ''
+        run: |
+          releasePRNum="$(gh pr list --base main --json number,headRefName --jq 'if .[0].headRefName == "staging" then .[0].number else "" end')"
+          echo 'RELEASE_PR_NUM='$releasePRNum >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Open Release PR
+        if: env.CHANGES_DESC != '' && env.RELEASE_PR_NUM == ''
+        run: |
+          releasePRUrl="$(gh pr create --base main --head staging --title "Release 🎉" --body-file desc.txt)"
+          echo 'RELEASE_PR_URL='$releasePRUrl >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update Release PR
+        if: env.CHANGES_DESC != '' && env.RELEASE_PR_NUM != ''
+        run: |
+          releasePRUrl="$(gh pr edit $RELEASE_PR_NUM --body-file desc.txt)"
+          echo 'RELEASE_PR_URL='$releasePRUrl >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,7 @@
+{
+  "name": "Prepare Release to Production",
+  "description": "Reflective CI starter prepare workflow.",
+  "iconName": "reflective-logo",
+  "categories": [],
+  "filePatterns": []
+}
