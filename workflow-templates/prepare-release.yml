@@ -1,9 +1,7 @@
 name: Prepare Release to Production
 
 on:
-  push:
-    branches:
-      - staging
+  workflow_call:
 
 jobs:
   prepare:

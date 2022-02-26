@@ -1,11 +1,7 @@
 name: Complete Release to Production
 
 on:
-  pull_request_review:
-    types: [submitted]
-    branches:
-      - main
-      - staging
+  workflow_call:
 
 jobs:
   merge_release:
