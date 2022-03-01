@@ -20,7 +20,7 @@ jobs:
           ref: main
           fetch-depth: 0
       - name: Open Backmerge PR
-        run: gh pr create --base staging --head main --title "Backmerge ⏩" --body "Backmerge for #${{ github.event.pull_request.number }}"
+        run: gh pr create --base staging --head main --title "Backmerge ⏩" --body "Backmerge for GH-${{ github.event.pull_request.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   merge_backmerge:
