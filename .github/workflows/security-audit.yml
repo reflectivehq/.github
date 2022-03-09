@@ -1,0 +1,53 @@
+name: Security Audit
+
+on:
+  workflow_call:
+
+jobs:
+  run:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v2
+      - name: Add pkg dependencies 📦
+        run: |
+          sudo apt-get update
+          sudo apt-get -yqq install libpq-dev
+      - name: Setup Ruby 💎
+        uses: ruby/setup-ruby@v1
+        env:
+          BUNDLE_DEPLOYMENT: false
+      - name: Install gems 🎁
+        run: |
+          gem install bundler-audit
+          gem install bundler-audit-fix
+      - name: Audit 🤖
+        shell: bash {0}
+        run: |
+          git config --global user.email "security@reflective.co"
+          git config --global user.name "Reflective Security"
+          bundle-audit check --update
+          echo 'HAS_VULNERABILITIES='$? >> $GITHUB_ENV
+      - name: Fix Vulnerabilities 🔨 
+        if: env.HAS_VULNERABILITIES != '0'
+        shell: bash {0}
+        run: |
+          echo -e "fix: patching vulnerabilities\n\n" > desc.txt
+          bundle audit check >> desc.txt
+          bundle audit-fix
+          branchName="fix/bundler-audit-$(shasum -a 256 desc.txt | awk '{print $1}')"
+          git checkout -b $branchName
+          commitMessage="$(cat desc.txt)"
+          git add Gemfile* 
+          git commit -m "$commitMessage"
+          git push --set-upstream origin $branchName --force
+          echo 'FIX_BRANCH='$branchName >> $GITHUB_ENV
+        env: 
+          BUNDLE_ENTERPRISE__CONTRIBSYS__COM: ${{ secrets.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
+      - name: Open PR 🥽
+        if: env.FIX_BRANCH != '0'
+        run: |
+          gh pr create --base staging --head $FIX_BRANCH --title "Security Patch 🤖" --body-file desc.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
