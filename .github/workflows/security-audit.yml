@@ -5,8 +5,6 @@ on:
     secrets:
       BUNDLE_ENTERPRISE__CONTRIBSYS__COM:
         required: false
-      GITHUB_TOKEN:
-        required: true
 
 jobs:
   run:
