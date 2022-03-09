@@ -1,0 +1,7 @@
+{
+  "name": "Security Audit",
+  "description": "Reflective CI Security Audit.",
+  "iconName": "reflective-logo",
+  "categories": [],
+  "filePatterns": []
+}
