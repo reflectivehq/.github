@@ -19,7 +19,14 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Find Backmerge PR
+        run: |
+          backmergePRNum="$(gh pr list --base staging --head main --json number --jq '.[0].number')"
+          echo 'BACKMERGE_PR_NUM='$backmergePRNum >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Open Backmerge PR
+        if: env.BACKMERGE_PR_NUM == ''
         run: gh pr create --base staging --head main --title "Backmerge ⏩" --body "Backmerge for GH-${{ github.event.pull_request.number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
