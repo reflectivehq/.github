@@ -21,7 +21,7 @@ jobs:
         with:
           heroku_api_key: ${{ secrets.api_key }}
           heroku_app_name: ${{ inputs.app_name }}
-          heroku_email: "scott@reflective.co"
+          heroku_email: "swindsor@gmail.com"
           team: "reflective"
           dontautocreate: true
           branch: master
