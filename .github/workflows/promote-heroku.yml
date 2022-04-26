@@ -23,6 +23,5 @@ jobs:
           heroku_app_name: ""
           heroku_email: "swindsor@gmail.com"
           justlogin: true
-      - run:
-        heroku pipelines:promote -a ${{ inputs.app_name }}
+      - run: heroku pipelines:promote -a ${{ inputs.app_name }}
 
