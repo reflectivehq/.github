@@ -1,0 +1,23 @@
+name: Deploy to heroku
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        description: 'heroku app name'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{ inputs.app_name }}
+          heroku_email: "scott@reflective.co"
+          team: "reflective"
+          dontautocreate: true
+          branch: master
