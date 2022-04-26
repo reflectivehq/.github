@@ -1,0 +1,7 @@
+{
+  "name": "Deploy to heroku",
+  "description": "Reflective CI starter deploy workflow",
+  "iconName": "reflective-logo",
+  "categories": [],
+  "filePatterns": []
+}
