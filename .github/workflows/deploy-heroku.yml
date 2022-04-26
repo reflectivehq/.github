@@ -24,4 +24,4 @@ jobs:
           heroku_email: "swindsor@gmail.com"
           team: "reflective"
           dontautocreate: true
-          branch: master
+          remote_branch: master
